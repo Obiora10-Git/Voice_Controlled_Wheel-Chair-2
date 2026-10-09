@@ -1,22 +1,36 @@
-
 const bluetoothStatus = document.getElementById('bluetooth_message');
-const esp32Status = document.getElementById('esp32_message')
+const esp32Status = document.getElementById('esp32_message');
+const statusText = document.getElementById('status_message') || bluetoothStatus; // Failsafe for statusText reference
 const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
 const CHARACTERISTIC_UUID = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
 const STATUS_UUID = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+
 let esp32Characteristic = null;
+let statusCharacteristic = null; // Declared missing variable
 let bleDevice = null;
 let bleServer = null;
 
+// Drive state placeholders required by your logic
+let currentDriveCommand = "S";
+let driveKeepAliveTimer = null;
+const MOVEMENT_COMMANDS = new Set(["F", "B", "L", "R", "S"]);
+let commandWriteQueue = Promise.resolve(); // Initialized the queue cleanly
+
+// Helper functions for the keepalive timer context
+function clearDriveKeepAlive() {
+    if (driveKeepAliveTimer) {
+        clearInterval(driveKeepAliveTimer);
+        driveKeepAliveTimer = null;
+    }
+}
+
 document.getElementById('bluetooth-btn').addEventListener('click', connectBluetooth);
 
-//Gotten from the Internet(A.I)
-// Function triggered by a button click on your website
+// The user-gesture handler remains preserved and direct
 async function connectBluetooth() {
   try {
     // Request a Bluetooth device matching specific filters
     bleDevice = await navigator.bluetooth.requestDevice({
-      //acceptAllDevices: true // Or filter by services/name
       filters: [{ services: [SERVICE_UUID] }]
     });
 
@@ -27,36 +41,30 @@ async function connectBluetooth() {
     statusCharacteristic = await service.getCharacteristic(STATUS_UUID);
 
     statusCharacteristic.addEventListener(
-            "characteristicvaluechanged",
-            handleWheelchairStatus
-        );
+        "characteristicvaluechanged",
+        handleWheelchairStatus
+    );
     await statusCharacteristic.startNotifications();
 
     console.log("Connected to: " + bleDevice.name);
     bluetoothStatus.textContent = "Connected to: " + bleDevice.name;
-
     esp32Status.textContent = "Connected. Waiting for wheelchair status...";
-
     console.log("Wheelchair connected:", bleDevice.name);
+
   } catch (error) {
     console.error("Bluetooth connection error:", error);
+    clearDriveKeepAlive();
+    currentDriveCommand = "S";
 
-        clearDriveKeepAlive();
-        currentDriveCommand = "S";
+    esp32Characteristic = null;
+    statusCharacteristic = null;
+    bleServer = null;
 
-        esp32Characteristic = null;
-        statusCharacteristic = null;
-        bleServer = null;
-
-        bluetoothStatus.textContent =
-            "Connection failed: " + error.message;
-    }
+    bluetoothStatus.textContent = "Connection failed: " + error.message;
   }
-
+}
 
 function handleBluetoothDisconnect() {
-
-    // Stop JavaScript's repeated movement packets.
     currentDriveCommand = "S";
     clearDriveKeepAlive();
 
@@ -64,146 +72,94 @@ function handleBluetoothDisconnect() {
     statusCharacteristic = null;
     bleServer = null;
 
-    bluetoothStatus.textContent =
-        "Wheelchair disconnected.";
-
-    esp32Status.textContent =
-        "Disconnected. ESP32 failsafe should stop movement.";
-
+    bluetoothStatus.textContent = "Wheelchair disconnected.";
+    esp32Status.textContent = "Disconnected. ESP32 failsafe should stop movement.";
     console.log("Bluetooth disconnected.");
 }
 
-const writeTask = async () => {
-
+// Fixed the floating queue problem by consolidating it into a safe, non-breaking function wrapper
+function sendCommand(value) {
+    const writeTask = async () => {
         // Discard obsolete movement commands waiting in the queue.
-        if (
-            MOVEMENT_COMMANDS.has(value) &&
-            currentDriveCommand !== value
-        ) {
+        if (MOVEMENT_COMMANDS.has(value) && currentDriveCommand !== value) {
             return false;
         }
 
         const characteristic = esp32Characteristic;
 
         if (!characteristic || !bleServer?.connected) {
-
-            if (
-                MOVEMENT_COMMANDS.has(value) &&
-                currentDriveCommand === value
-            ) {
+            if (MOVEMENT_COMMANDS.has(value) && currentDriveCommand === value) {
                 currentDriveCommand = "S";
                 clearDriveKeepAlive();
             }
             if (value !== "S") {
-                esp32Status.textContent =
-                    "Not connected. Command not sent.";
+                esp32Status.textContent = "Not connected. Command not sent.";
             }
-
             return false;
         }
 
         try {
-
             const data = new TextEncoder().encode(value);
-
             await characteristic.writeValue(data);
 
             console.log("Sent command:", value);
-
-            esp32Status.textContent =
-                "Sent command: " + value;
-
+            esp32Status.textContent = "Sent command: " + value;
             return true;
-            } catch (error) {
-
+        } catch (error) {
             console.error("Command transmission failed:", error);
+            esp32Status.textContent = "Transmission failed: " + error.message;
 
-            esp32Status.textContent =
-                "Transmission failed: " + error.message;
-
-            // Do not call stopDrive() here.
-            // That would call sendCommand("S") recursively.
-            // Stop repeating movement commands and let the ESP32
-            // communication timeout provide the independent failsafe.
             currentDriveCommand = "S";
             clearDriveKeepAlive();
-
             return false;
         }
-      
-    }
-     // Queue Bluetooth writes to avoid overlapping operations.
-    commandWriteQueue =
-        commandWriteQueue.then(writeTask, writeTask);
+    };
 
+    // Queue Bluetooth writes dynamically to avoid overlapping operations without throwing scope syntax errors
+    commandWriteQueue = commandWriteQueue.then(writeTask, writeTask);
     return commandWriteQueue;
-
-    
-
+}
 
 function startDrive(command) {
-
     if (!MOVEMENT_COMMANDS.has(command)) {
         return;
     }
 
     if (!esp32Characteristic || !bleServer?.connected) {
-
-        statusText.textContent =
-            "Please connect the wheelchair first.";
-
+        statusText.textContent = "Please connect the wheelchair first.";
         return;
     }
 
-    // Remember the movement command.
     currentDriveCommand = command;
-
-    // Prevent an old timer from sending an old direction.
     clearDriveKeepAlive();
-    // Send the first command immediately.
     sendCommand(command);
 
-    // Repeat every 200 ms to satisfy the firmware's
-    // 500 ms communication failsafe.
     driveKeepAliveTimer = setInterval(() => {
-
         if (currentDriveCommand === command) {
             sendCommand(command);
         }
-
     }, 200);
 }
 
 function stopDrive() {
-
     currentDriveCommand = "S";
-
-    // Stop repeated F/B/L/R packets.
     clearDriveKeepAlive();
 
-    // Send S when Bluetooth is connected.
-    // The ESP32 handles the actual motor stopping.
     if (esp32Characteristic && bleServer?.connected) {
         sendCommand("S");
     }
 }
 
-// Expected format from wheelchair.ino:
-// B87;V12.4;D120;F
-
 function handleWheelchairStatus(event) {
-
-    const message =
-        new TextDecoder().decode(event.target.value).trim();
-
+    const message = new TextDecoder().decode(event.target.value).trim();
     console.log("Wheelchair status:", message);
 
     const parts = message.split(";");
-
     if (parts.length !== 4) {
         return;
     }
- const battery = parts[0].replace("B", "");
+
+    const battery = parts[0].replace("B", "");
     const voltage = parts[1].replace("V", "");
     const distance = parts[2].replace("D", "");
     const motion = parts[3];
@@ -217,19 +173,13 @@ function handleWheelchairStatus(event) {
         X: "Safety lockout or critical battery"
     };
 
-    // If the ESP32 reports a safety lockout, stop the
-    // browser's repeated movement packets. Do not
-    // automatically send S, because S resets the lockout.
     if (motion === "X") {
         currentDriveCommand = "S";
         clearDriveKeepAlive();
-
-        statusText.textContent =
-            "Safety lockout detected. Say STOP to reset it.";
+        statusText.textContent = "Safety lockout detected. Say STOP to reset it.";
     }
 
-    const distanceText =
-        distance === "-1" ? "Unavailable" : distance + " cm";
+    const distanceText = distance === "-1" ? "Unavailable" : distance + " cm";
 
     esp32Status.textContent =
         "Battery: " + battery + "% | " +
@@ -237,4 +187,3 @@ function handleWheelchairStatus(event) {
         "Obstacle: " + distanceText + " | " +
         "Motion: " + (motionLabels[motion] || motion);
 }
-
