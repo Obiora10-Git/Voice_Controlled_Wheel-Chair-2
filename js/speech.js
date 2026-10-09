@@ -3,7 +3,7 @@ const micOn = document.getElementById('mic_on');
 const micOff = document.getElementById('mic_off');
 const speechErrorMessageText = document.getElementById('error_message');
 const voiceErrorMessageText = document.getElementById('voice_message');
-const statusText = document.getElementById('status_message');
+const statusText = document.getElementById('status_message') || bluetoothStatus; // Failsafe for statusText reference
 const outputText = document.getElementById('hidden_commands');
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition; 
