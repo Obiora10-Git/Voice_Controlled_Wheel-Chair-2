@@ -1,0 +1,78 @@
+
+.specials{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    
+}
+
+.special_btn_box{
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 1.5rem;
+    padding: 1rem;
+    z-index: 300;
+}
+.special_btn_box button{
+    background-color: none;
+    border-radius: 50%;
+    border-color: transparent;
+
+}
+
+.specials .specials_btn{
+    border-radius: 50%;
+    background-color: var(--black-circle-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.mic_control{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+
+}
+
+.mic_container{
+    border-radius: 50%;
+    background-color: var(--mic-container);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mic_btn_box{
+    display: flex;
+    gap: 3rem;
+}
+
+.mic_btn_box button{
+    height: 3.5rem;
+    width: 5rem;
+    border-radius: 0.5rem;
+    border-color: transparent;
+
+}
+
+.mic_btn_box button div{
+    width: 100%;
+    height: 100%;
+    background-color: var(--black-circle-color);
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+

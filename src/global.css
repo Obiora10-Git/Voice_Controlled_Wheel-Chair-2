@@ -1,0 +1,324 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+  --bg-color: #ffffff;
+  --half-way-bg: #ffffff80;
+  --black-circle-color: #000000;
+  --mic-inactive: #f5f5f5d0;
+  --mic-active: #ffffff;
+  --mic-container: #1e1e1e;
+
+--mic-inactive_bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23f5f5f5d0' d='M23 17a7 7 0 0 1-11.73 5.14l1.42-1.41A5 5 0 0 0 21 17v-4.58l9-9L28.59 2L2 28.59L3.41 30l6.44-6.44A8.9 8.9 0 0 0 15 25.94V28h-4v2h10v-2h-4v-2.06A9 9 0 0 0 25 17v-3h-2Zm-14 .32V14H7v3a9 9 0 0 0 .25 2.09ZM20.76 5.58A5 5 0 0 0 11 7v8.34Z'/%3E%3C/svg%3E");
+   
+    --mic-active_bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg fill='%23fff' %3E%3Crect width='6' height='12' x='5' rx='3' ry='3'/%3E%3Cpath d='M7 13h2v3H7z'/%3E%3C/g%3E%3Cpath fill='none' stroke='%23fff' stroke-linecap='round' d='M3.5 6.5V9a4.5 4.5 0 0 0 9 0V6.5'/%3E%3C/svg%3E");
+  --inactive-visibility: inline-block;
+  --active-visiblitiy: none;
+
+  --outline-color: #000;
+  --outline-inactive-visibility: auto;
+  --outline-active-visibility: none;
+}
+
+body.dark-mode {
+  --bg-color: #121212;
+  --half-way-bg: #12121280;
+  --black-circle-color: #ffffff;
+  --mic-inactive: #333333;
+  --mic-active:  #121212;
+  --mic-container: #f5f5f5d0;
+ --mic-inactive_bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23333' d='M23 17a7 7 0 0 1-11.73 5.14l1.42-1.41A5 5 0 0 0 21 17v-4.58l9-9L28.59 2L2 28.59L3.41 30l6.44-6.44A8.9 8.9 0 0 0 15 25.94V28h-4v2h10v-2h-4v-2.06A9 9 0 0 0 25 17v-3h-2Zm-14 .32V14H7v3a9 9 0 0 0 .25 2.09ZM20.76 5.58A5 5 0 0 0 11 7v8.34Z'/%3E%3C/svg%3E");
+
+    --mic-active_bg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cg fill='%23000'%3E%3Crect width='6' height='12' x='5' rx='3' ry='3'/%3E%3Cpath d='M7 13h2v3H7z'/%3E%3C/g%3E%3Cpath fill='none' stroke='%23000' stroke-linecap='round' d='M3.5 6.5V9a4.5 4.5 0 0 0 9 0V6.5'/%3E%3C/svg%3E");
+    --outline-color: #fff;
+}
+
+body.active-speech{
+    --inactive-visibility: none;
+    --active-visibility: inline-block;
+  --outline-inactive-visibility: none;
+  --outline-active-visibility: auto;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--black-circle-color);
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition */
+    font-family: 'Inter';
+    font-size: 1.25rem;
+    width: 100vw;
+    min-height: 100vh;
+    z-index: -10;
+    overflow: hidden;
+    animation: bg_drag 0.15s ease forwards ;
+}
+
+main{
+    width: 100vw;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-direction: column;
+}
+
+section{
+    border: none;
+    height: auto;
+    width: 100%;
+}
+
+button{
+  cursor: pointer;
+}
+
+.mic_section{
+    padding: 1rem;
+    height: 80vh;
+}
+
+.bg_palette{
+    fill: var(--bg-color);
+}
+
+
+.bluetooth_stroke{
+    stroke: var(--bg-color);
+}
+
+.info_icon{
+  fill: var(--bg-color);
+}
+
+.carbon--microphone-off-filled {
+  display: var(--inactive-visibility);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-image: var(--mic-inactive_bg);
+  transition: background-image 0.3s;
+}
+
+.garden--microphone-on-fill-16 {
+  display: var(--active-visibility);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+  background-image: var(--mic-active_bg);
+  transition: background-image 0.3s;
+}
+
+.no_speech{
+    fill: var(--mic-inactive)
+}
+
+.speech{
+    fill: var(--mic-active)
+}
+
+.mic_off{
+    outline-width: 10px ;
+    outline-color: var(--outline-color);
+    outline: var(--outline-inactive-visibility);
+    outline-offset: 5px;
+}
+
+.mic_on{
+    outline-width: 10px ;
+    outline-color: var(--outline-color);
+    outline: var(--outline-active-visibility);
+    outline-offset: 5px;
+}
+
+/*how to make a splash screen*/
+
+.VCMC-intro{
+    position: fixed;
+    height: 100vh;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background-color: #000000 ;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1), opacity 5s ease;
+}
+
+/* Entrance animation for Logo/Text inside Splash */
+.VCMC_bg{
+    border-radius: 50%;
+    background-image: url('/assets/img/Ellipse\ 1.png');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    text-align: center;
+    color: #ffffff;
+    animation: scaleIn 0.75s ease-in-out forwards;
+}
+
+
+/* Modifier class added by JS to reveal the app */
+.VCME-intro.fade-out {
+  opacity: 0;
+  transform: scale(1.1); /* Zoom effect as it disappears */
+  pointer-events: none;  /* Allows clicking through to app after fade */
+}
+
+/* Main App Layout */
+.app-content {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 1s ease 0.2s, transform 0.5s ease 0.3s; /* Delayed to match splash exit */
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: auto;
+  width: 100vw;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+}
+
+/* Initial state of main app before loading finishes */
+.app-content.hidden {
+  opacity: 0;
+  transform: translateY(15px);
+}
+
+/* Keyframes for Logo Pop */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bg_drag {
+  from {
+    opacity: 0.75;
+    background-color: var(--half-way-bg);
+  }
+  to{
+    opacity: 1;
+    background-color: var(--bg-color);
+  }
+}
+
+
+/* Respect user settings for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .VCMC-intro, .app-content, .VCMC_bg {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.info_message_box{
+  display: none;
+}
+
+.info_message_box.active_info{
+  background-color: var(--bg-color);
+    height:100vh;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    display: block;
+}
+
+.info_message{
+  opacity: 0;
+  display: none;
+}
+
+.info_message.active_info{
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: justify;
+    gap: 1rem;
+    background-color: var(--mic-container);
+    opacity: 1;
+
+}
+
+.specials_section.active_info{
+  background-color: var(--mic-container);
+}
+
+
+
+.message_box{
+  padding: 1rem;
+  background-color: none;
+  border-color: none;
+  border-radius: 0.5rem;
+  max-height: 4rem;
+  width:100%;
+  text-align: justify;
+  background-color: var(--bg-color);
+  color: var(--black-circle-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  opacity: 1;
+}
+
+.text_bold{
+  font-weight: 700;
+}
+
+.message_label{
+    padding: 1rem;
+  background-color: none;
+  border-radius: 0.075rem 0.3rem 0.3rem 0.075rem;
+  border-right: 0.25rem dotted var(--black-circle-color) ;
+  height: auto;
+  width:fit-content;
+  background-color: var(--mic-container);
+  color: var(--bg-color);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  opacity: 1;
+  white-space: nowrap;
+}
+
+.message_box_contr{
+  width: fit-content;
+   display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  opacity: 1;
+  border: 0.35rem solid var(--black-circle-color) ;
+  border-radius: 0.5rem;
+  background-color: var(--bg-color);
+}

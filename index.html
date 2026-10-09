@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/src/global.css">
+    <link rel="stylesheet" href="/src/responsive.css">
+    <link rel="stylesheet" href="/src/VCWC.css">
+    <title>Voice-controlled Wheel Chair</title>
+</head>
+<body>
+    <div id="splash_screen"class="VCMC-intro">
+        <div class="VCMC_bg VCMC_bg_size"></div>
+    </div>
+     
+    <div id="app_content" class="app-content hidden">
+        <main>
+        <div id="specials_section" class="specials_section hidden">
+            <div class="specials">
+                <div class="special_btn_box">
+                    <button id="info_btn">
+                        <div class="specials_btn specials_btn_size" onclick="checkInfo()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="info_icon_size" viewBox="0 0 24 24">
+                            <path d="M0 0h24v24H0z" fill="none" />
+                            <path class="info_icon" fill-rule="evenodd" d="M12 1C5.925 1 1 5.925 1 12s4.925 11 11 11s11-4.925 11-11S18.075 1 12 1m-.5 5a1 1 0 1 0 0 2h.5a1 1 0 1 0 0-2zM10 10a1 1 0 1 0 0 2h1v3h-1a1 1 0 1 0 0 2h4a1 1 0 1 0 0-2h-1v-4a1 1 0 0 0-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                    </button>
+                    <button id="bg_color_btn">
+                        <div class="specials_btn specials_btn_size" onclick="bgSwitch()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="bg_palette_size" viewBox="0 0 512 512">
+                                <path d="M0 0h512v512H0z" fill="none" />
+                                <path class="bg_palette" d="M416 352c-12.6-.84-21-4-28-12c-14-16-14-36 5.49-52.48l32.82-29.14c50.27-44.41 50.27-117.21 0-161.63C389.26 64.14 339.54 48 287.86 48c-60.34 0-123.39 22-172 65.11c-90.46 80-90.46 210.92 0 290.87c45 39.76 105.63 59.59 165.64 60h1.84c60 0 119.07-19.5 161.2-56.77C464 390 464 385 444.62 355.56C440 348 431 353 416 352M112 208a32 32 0 1 1 32 32a32 32 0 0 1-32-32m40 135a32 32 0 1 1 32-32a32 32 0 0 1-32 32m40-199a32 32 0 1 1 32 32a32 32 0 0 1-32-32m64 271a48 48 0 1 1 48-48a48 48 0 0 1-48 48m72-239a32 32 0 1 1 32-32a32 32 0 0 1-32 32" />
+                            </svg>
+                        </div>
+                    </button>
+                    <button id="bluetooth_btn">
+                        <div class="specials_btn specials_btn_size">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="bluetooth_size" viewBox="0 0 24 24">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path fill="none" class="bluetooth_stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m5 7l12 10l-6 5V2l6 5L5 17" />
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>    
+        <div class="mic_section">
+            <div class="mic_control">
+                <div class="mic_container mic_container_size">
+                    <div class="mic_off_box">
+                        <span class="carbon--microphone-off-filled mic_container_bg"></span>
+                    </div>
+                    <div class="mic_on_box">
+                        <span class="garden--microphone-on-fill-16 mic_container_bg"></span>
+                    </div>
+                </div>
+                <div class="mic_btn_box">
+                    <button id="mic_off" class="mic_off" onclick="micOff()">
+                        <div>
+                           <svg xmlns="http://www.w3.org/2000/svg" class="no_speech_size" viewBox="0 0 24 24">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <g class="no_speech">
+                                <path d="M10 10a1 1 0 1 1-2 0a1 1 0 0 1 2 0m5 1a1 1 0 1 0 0-2a1 1 0 0 0 0 2" />
+                                <path fill-rule="evenodd" d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2S2 6.477 2 12s4.477 10 10 10m0-2a8 8 0 1 0 0-16a8 8 0 0 0 0 16" clip-rule="evenodd" />
+                                </g>
+                            </svg>
+                        </div>
+                    </button>
+                    <button id="mic_on" class="mic_on" onclick="micOn()">
+                        <div>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="speech_size" viewBox="0 0 24 24">
+                                <path d="M0 0h24v24H0z" fill="none" />
+                                <path class="speech" d="M8 4a4 4 0 1 0 0 8a4 4 0 1 0 0-8m7.54 7.54c2.02-2.02 2.02-5.06 0-7.07l-1.41 1.41c1.23 1.23 1.23 3.01 0 4.24l1.41 1.41Z" />
+                                <path class="speech" d="m18.36 1.64l-1.41 1.41c2.87 2.87 2.87 7.03 0 9.9l1.41 1.41c3.63-3.63 3.63-9.1 0-12.73ZM3 20h10c.55 0 1-.45 1-1v-1c0-2.76-2.24-5-5-5H7c-2.76 0-5 2.24-5 5v1c0 .55.45 1 1 1" />
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+                <div id="info_message_box" class="info_message_box">
+                    <div id="info_message" class="info_message">
+                        <div class="message_box_contr">
+                            <div class="message_label text_bold">ESP Error</div>
+                             <div id="esp32_message" class="message_box text_bold">
+                            ...
+                             </div>
+                        </div>
+                        <div class="message_box_contr">
+                            <div class="message_label text_bold">BlueTooth Error</div>
+                             <div id="bluetooth_message" class="message_box text_bold">
+                            ...
+                             </div>
+                        </div>
+                        <div class="message_box_contr">
+                            <div class="message_label text_bold">Commands</div>
+                            <div id="hidden_commands" class="message_box text_bold">
+                            ...
+                            </div>
+                        </div>
+                        <div class="message_box_contr">
+                            <div class="message_label text_bold">Mic Error</div>
+                             <div id="error_message" class="message_box text_bold">
+                            ...
+                             </div>
+                        </div>
+                        <div class="message_box_contr">
+                            <div class="message_label text_bold">Status</div>
+                            <div id="status_message" class="message_box text_bold">
+                            ...
+                        </div>
+                        </div>
+                        <div class="message_box_contr">
+                            <div class="message_label text_bold">Mic Info</div>
+                            <div id="voice_message" class="message_box text_bold">
+                           ...
+                        </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+    </main>
+    </div>
+    <script src="/app.js"></script>
+    <script src="/js/speech.js"></script>
+    <script src="/js/UI.js"></script>
+</body>
+</html>
