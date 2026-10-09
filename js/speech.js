@@ -21,7 +21,7 @@ if (!SpeechRecognition) {
     recognition.maxAlternatives = 1; 
 
     // Target phrases to recognize 
-    const targetPhrases = ["tooth", "theme", "forward", "backward", "left", "right", "stop", "anticlockwise", "clockwise"]; 
+    const targetPhrases = ["theme", "forward", "backward", "left", "right", "stop", "anticlockwise", "clockwise"]; 
 
     function getSimilarity(str1, str2) {
   const track = Array(str2.length + 1).fill(null).map(() => Array(str1.length + 1).fill(null));
@@ -231,6 +231,12 @@ function clearDriveKeepAlive() {
         `Success! Action triggered for: "${phrase}"`;
 
     switch (phrase) {
+        case "theme":
+    bgSwitch();
+    outputText.textContent = "Theme toggled";
+    break;
+
+
         case "forward":
             outputText.textContent = "Forward";
             startDrive("F");
@@ -256,7 +262,7 @@ function clearDriveKeepAlive() {
             stopDrive();
             break;
 
-        case "anti clockwise":
+        case "anticlockwise":
             outputText.textContent = "Anti-clockwise";
             startDrive("L");
             break;

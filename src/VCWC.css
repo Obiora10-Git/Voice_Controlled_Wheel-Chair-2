@@ -17,9 +17,12 @@
     z-index: 300;
 }
 .special_btn_box button{
-    background-color: none;
+     background: transparent;
+    border: none;
+    padding: 0;
     border-radius: 50%;
-    border-color: transparent;
+    cursor: pointer;
+    appearance: none;
 
 }
 

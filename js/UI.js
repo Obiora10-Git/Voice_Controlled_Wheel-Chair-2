@@ -9,6 +9,11 @@ const currentTheme = localStorage.getItem('theme');
 const appContent = document.getElementById('app_content');
 const specialBtnContent = document.getElementById('specials_section')
 
+document.getElementById('info_btn')
+    ?.addEventListener('click', checkInfo);
+
+document.getElementById('bg_color_btn')
+    ?.addEventListener('click', bgSwitch);
 
 window.addEventListener('DOMContentLoaded', () => {
   const splash = document.getElementById('splash_screen');
