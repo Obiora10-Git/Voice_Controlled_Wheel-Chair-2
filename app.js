@@ -27,31 +27,89 @@ document.getElementById('bluetooth_btn').addEventListener('click', connectBlueto
 
 // The user-gesture handler remains preserved and direct
 async function connectBluetooth() {
-  try {
-    // Request a Bluetooth device matching specific filters
+try {
+// Step 1: Check whether Web Bluetooth exists.
+if (!navigator.bluetooth) {
+throw new Error(
+"Web Bluetooth is not supported in this browser. " +
+"Open this website in Google Chrome or Microsoft Edge " +
+"using HTTPS or localhost."
+);
+}
+
+
+    if (!window.isSecureContext) {
+        throw new Error(
+            "Bluetooth requires a secure page. Open the website " +
+            "using HTTPS or localhost."
+        );
+    }
+
+    bluetoothStatus.textContent = "Searching for wheelchair...";
+
+    // Step 2: Select the ESP32.
     bleDevice = await navigator.bluetooth.requestDevice({
-      filters: [{ services: [SERVICE_UUID] }]
+        filters: [{ services: [SERVICE_UUID] }]
     });
 
-    // Connect to the device's server
-    bleServer = await bleDevice.gatt.connect();
-    const service = await bleServer.getPrimaryService(SERVICE_UUID);
-    esp32Characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
-    statusCharacteristic = await service.getCharacteristic(STATUS_UUID);
+    if (!bleDevice.gatt) {
+        throw new Error(
+            "This browser or device does not provide GATT support."
+        );
+    }
 
+    // Step 3: Connect to the ESP32 GATT server.
+    bluetoothStatus.textContent = "Connecting to ESP32...";
+
+    bleServer = await bleDevice.gatt.connect();
+
+    // Step 4: Find the BLE service.
+    const service = await bleServer.getPrimaryService(
+        SERVICE_UUID
+    );
+
+    // Step 5: Find the command and status characteristics.
+    esp32Characteristic = await service.getCharacteristic(
+        CHARACTERISTIC_UUID
+    );
+
+    statusCharacteristic = await service.getCharacteristic(
+        STATUS_UUID
+    );
+
+    // Step 6: Listen for disconnection.
+    bleDevice.removeEventListener(
+        "gattserverdisconnected",
+        handleBluetoothDisconnect
+    );
+
+    bleDevice.addEventListener(
+        "gattserverdisconnected",
+        handleBluetoothDisconnect
+    );
+
+    // Step 7: Enable incoming status notifications.
     statusCharacteristic.addEventListener(
         "characteristicvaluechanged",
         handleWheelchairStatus
     );
+
     await statusCharacteristic.startNotifications();
 
-    console.log("Connected to: " + bleDevice.name);
-    bluetoothStatus.textContent = "Connected to: " + bleDevice.name;
-    esp32Status.textContent = "Connected. Waiting for wheelchair status...";
-    console.log("Wheelchair connected:", bleDevice.name);
+    // Step 8: Update the interface.
+    bluetoothStatus.textContent =
+        "Connected to: " + (bleDevice.name || "ESP32");
 
-  } catch (error) {
+    esp32Status.textContent =
+        "Connected. Waiting for wheelchair status...";
+
+    console.log("Bluetooth connected successfully.");
+    console.log("Device:", bleDevice.name);
+    console.log("GATT connected:", bleServer.connected);
+
+} catch (error) {
     console.error("Bluetooth connection error:", error);
+
     clearDriveKeepAlive();
     currentDriveCommand = "S";
 
@@ -59,9 +117,16 @@ async function connectBluetooth() {
     statusCharacteristic = null;
     bleServer = null;
 
-    bluetoothStatus.textContent = "Connection failed: " + error.message;
-  }
+    bluetoothStatus.textContent =
+        "Bluetooth error: " + error.message;
+
+    esp32Status.textContent =
+        "Connection unsuccessful. Check browser support and ESP32.";
 }
+
+
+}
+
 
 function handleBluetoothDisconnect() {
     currentDriveCommand = "S";
