@@ -24,7 +24,7 @@ function clearDriveKeepAlive() {
     }
 }
 
-document.getElementById('bluetooth-btn').addEventListener('click', connectBluetooth);
+document.getElementById('bluetooth_btn').addEventListener('click', connectBluetooth);
 
 // The user-gesture handler remains preserved and direct
 async function connectBluetooth() {
